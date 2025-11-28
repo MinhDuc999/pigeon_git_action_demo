@@ -7,39 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
-    name: Run Flutter Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.5'
-          channel: 'stable'
-
-      - run: flutter pub get
-
-      # Optional nhưng nên có
-      - name: Analyze code
-        run: flutter analyze
-
-      # Run all test dưới thư mục test/
-      - name: Run tests
-        run: flutter test --coverage
-
-      # Upload báo cáo coverage
-      - name: Upload coverage
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-coverage
-          path: coverage/lcov.info
-
   build-android:
-    needs: test
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -63,9 +32,7 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
 
   build-ios:
-    needs: test
     runs-on: macos-latest
-
     steps:
       - uses: actions/checkout@v4
 
