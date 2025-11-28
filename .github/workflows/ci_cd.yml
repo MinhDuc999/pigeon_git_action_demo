@@ -22,6 +22,7 @@ jobs:
           flutter-version: '3.13.10'
           channel: 'stable'
 
+      - run: flutter clean
       - run: flutter pub get
       - run: flutter pub run pigeon --input pigeons/messages.dart
       - run: flutter build apk --release
@@ -41,6 +42,7 @@ jobs:
           flutter-version: '3.13.10'
           channel: 'stable'
 
+      - run: flutter clean
       - run: flutter pub get
       - run: flutter pub run pigeon --input pigeons/messages.dart
       - run: cd ios && pod install
