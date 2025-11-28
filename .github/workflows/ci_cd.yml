@@ -19,7 +19,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.10'
+          flutter-version: '3.24.5'
           channel: 'stable'
 
       - run: flutter clean
@@ -39,7 +39,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.10'
+          flutter-version: '3.24.5'
           channel: 'stable'
 
       - run: flutter clean
