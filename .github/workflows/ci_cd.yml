@@ -1,0 +1,91 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Run Flutter Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+
+      - run: flutter pub get
+
+      # Optional nhưng nên có
+      - name: Analyze code
+        run: flutter analyze
+
+      # Run all test dưới thư mục test/
+      - name: Run tests
+        run: flutter test --coverage
+
+      # Upload báo cáo coverage
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-coverage
+          path: coverage/lcov.info
+
+  build-android:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+
+      - run: flutter pub get
+      - run: flutter pub run pigeon --input pigeons/messages.dart
+      - run: flutter build apk --release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  build-ios:
+    needs: test
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+
+      - run: flutter pub get
+      - run: flutter pub run pigeon --input pigeons/messages.dart
+      - run: cd ios && pod install
+      - run: flutter build ios --release --no-codesign
+
+      - run: |
+          cd build/ios/iphoneos
+          mkdir Payload
+          cp -r Runner.app Payload
+          zip -r app.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: build/ios/iphoneos/app.ipa
